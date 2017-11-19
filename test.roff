@@ -1,0 +1,22 @@
+.ig
+    test.roff	An example file that demonstrates some RPN processing
+		capabilities using the `rpn.roff` module.
+    
+    Stephanie Björk (Katt) <katt64@tuta.io>
+..
+.so rpn.roff \" Source RPN processing module
+.ig
+Infix notation:		(4 + 5 + 9 - 2) / 4
+Postfix notation:	4 5 9 + 2 - 4 / 
+Expected answer:	4
+..
+.RPNPUSH 4 \" Push operand 4 to token stack
+.RPNPUSH 5 \" Push operand 5 to token stack
+.RPNPUSH 9 \" Push operand 9 to token stack
+.RPNPUSH + \" Push operator + to token stack (5 + 9)
+.RPNPUSH + \" Push operator + to token stack (4 + 14)
+.RPNPUSH 2 \" Push operand 2 to token stack
+.RPNPUSH - \" Push operator - to token stack (18 - 2)
+.RPNPUSH 4 \" Push operand 4 to token stack
+.RPNPUSH / \" Push operator / to token stack (16 / 4)
+.RPNEVAL \" Evaluate token stack and print result to Postscript (= 4)
