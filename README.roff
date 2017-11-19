@@ -1,0 +1,374 @@
+.he ''%''
+.fo ''rpn-calculator README''
+.tp
+.sp 3i
+.ce 2
+.ps 20
+rpn-calculator\**
+.(f
+\** One of the few calculators made in pure \s-2TROFF\s0
+.)f
+.ps
+.sp
+.ps 14
+Stephanie Björk
+.ps
+.bp
+.(x
+Main matter
+.)x
+.sh 1 "Introduction"
+.(x mm
+Introduction
+.)x
+.pp
+This project\*#
+.(d
+\*#
+.ul
+rpn-calculator
+on Github:
+https://github.com/katt64/rpn-calculator
+.)d
+is a simple calculator that evaluates expressions put in \fIReverse
+Polish Notation\fP\*#
+.(d
+\*#
+.ul
+Reverse Polish Notation
+on Wikipedia:
+https://en.wikipedia.org/wiki/Reverse_Polish_notation
+.)d
+(RPN) or \fIPostfix notation\fP as some call them.
+The program is aptly named \fIrpn-calculator\fP.
+The entirety of the program is written in pure and plain \s-2TROFF\s0 with no
+macros or preprocessors used whatsoever.
+.pp
+Originally written by Stephanie Bj\[:o]rk\*#,
+.(d
+\*#
+.ul
+Stephanie Björk
+(Personal Website):
+https://katt64.github.io
+.)d
+it is hoped that this project will
+help one realize the capabilities of the \s-2TROFF\s+2 typesetting language,
+that it is not merely a typesetting language but perhaps a fully-fledged,
+Turing-complete programming language; and also inspire other maintainers and
+contributors whoever they are.
+.sh 1 "Capabilities"
+.(x mm
+Capabilities
+.)x
+.pp
+As of now, the calculator is capable of handling integers of fairly large sizes.
+The size of \fIlarge\fP largely depends on the capabilities of \s-2TROFF\s0's
+numerical register (\fC.nr\fP).
+.pp
+It is also capable of handling up to 26 tokens in its token stack (Alice stack),
+and subseqently 26 machine-sized values in its evalulation stack (Birch stack).
+This limit is semi-artificial.
+If you can read \s-2TROFF\s0 source files and understand my intentions, you'll
+know my reasonings.
+I had been thinking about giving a total of 676 (26\(mu26) spaces in the token
+stack, but I feel that it would be too \fIloud\fP and would cause \fIunintended
+interference\fP towards other numerical registers.
+Nonetheless, this program serves as a \fIpractical demonstration\fP; so, a token
+stack size of more than 26 is usually unnecessary nonetheless.
+.pp
+The calculator currently handles 5 basic binary operations:
+.bu
+Addition (\(pl)
+.bu
+Subtraction (\(mi)
+.bu
+Multiplication (*)
+.bu
+Division (/)
+.bu
+Modulo (%)
+.pp
+It takes input expressions translated into Reverse Polish Notation, from a
+\s-2TROFF\s0 source file interspersed with requests that push each token into
+the token stack, and a request to evaluate the expression in the token stack.
+It outputs the result and certain errors (if any) into a Postscript file.
+.pp
+Modulo is the remainder of dividing two operands.
+So, if you share 23 cookies among 7 friends, each of them will get 3 cookies
+equally with 2 remaining for further fractioning.
+This can be expressed as ``23 \(di 7 \(eq 3 cookies for everyone'' and ``23 mod
+7 \(eq 2 cookies for further processing.''
+.sh 1 "Usage"
+.(x mm
+Usage
+.)x
+.pp
+To begin using the calculator, make sure you have the 3 necessary files listed
+below, obtainable from this repository.
+The directory hierarchy \fBmust\fP be preserved.
+.ip \fCrpn.roff\fP
+This is the \s-2TROFF\s0 source file that contains macros to handle input
+expressions, handle the token stack, evaluate said stack, and print the
+result (and errors) into a Postscript file.
+.ip \fCstacks/alice.roff\fP
+This is the \s-2TROFF\s0 source file that defines a basic numerical stack of 26
+available slots along with the methods to handle (push/pop) them.
+It also comes with a method (\fC.APS\fP) to print the stack counter (\fCaC\fP)
+for diagnostic reasons.
+This stack and its methods are labelled beginning with an \fCA\fP or \fCa\fP,
+which can be ``backronymed'' into Alice.
+.ip \fCstacks/birch.roff\fP
+This is the \s-2TROFF\s0 source file that defines a basic numerical stack of 26
+available slots along with the methods to handle (push/pop) them.
+It also comes with a method (\fC.BPS\fP) to print the stack counter (\fCbC\fP)
+for diagnostic reasons.
+This stack and its methods are labelled beginning with an \fCB\fP or \fCb\fP,
+which can be ``backronymed'' into Birch.
+.sh 2 "Input"
+.pp
+In the same directory as \fCrpn.roff\fP, prepare a \s-2TROFF\s0 source file as
+input to the calculator.
+The \fCtest.roff\fP file, though not necessary for the functioning of the
+calculator, is a very good example of an input file and also contains comments
+on what things are in the file.
+No skills in \s-2TROFF\s0 are required.
+.pp
+Following this paragraph is another example of an input file, showing only the
+absolutely necessary lines for a successful calculation.
+The expression to be evalulated is (7 \(pl 9) \(di (6 \(mi 4), which can be
+converted into Reverse Polish Notation as 7 9 \(pl 6 4 \(mi \(di.
+Comments begin with \fC\e"\fP and are ignored by the compiler.
+Commands are CaSE-SenSItIve and begin with a \fC.\fP (dot) on the first column.
+.(l
+.ft C
+.nm 1
+\&.so rpn.roff \e" Source the RPN processor module.
+\&.RPNPUSH 7 \e" Push operand 7 into the token stack.
+\&.RPNPUSH 9 \e" Push operand 9 into the token stack.
+\&.RPNPUSH + \e" Push operator + into the token stack.
+\&.RPNPUSH 6 \e" Push operand 6 into the token stack.
+\&.RPNPUSH 4 \e" Push operand 4 into the token stack.
+\&.RPNPUSH - \e" Push operator - into the token stack.
+\&.RPNPUSH / \e" Push operator / into the token stack.
+\&.RPNEVAL \e" Evaluate the token stack and print the result.
+.nm
+.ft P
+.)l
+.pp
+We will be using this source file throughout the entirety of this document.
+.sh 2 "Processing"
+.pp
+To process the source file and get our result, we must use a \s-2TROFF\s0
+compiler.
+A popular \s-2TROFF\s0 compiler is GNU Troff, which comes with most
+distributions of GNU/Linux and Cygwin, so you might not have to explicitly
+install it.
+The reason for its being installed by default is because most manual pages are
+typeset using Nroff when output to the terminal.
+.pp
+Henceforth assuming the input file is saved to \fCinput.roff\fP, to get your
+output in Postscript, run the following command:
+.(l
+.ft C
+groff input.roff > output.ps
+.ft
+.)l
+.lp
+This will evaluate the expression in the source file and output the numerical
+result straight to a Postscript file named \fCoutput.ps\fP.
+This file must be openned using a Postscript interpreter like Ghostscript.
+Technically, if your output is Postscript, the typesetting is done by
+\s-2TROFF\s0 (not Nroff).
+.pp
+If you want the output on TTY (terminal) instead, run the following command:
+.(l
+.ft C
+groff -Tutf8 input.roff | head -n 2
+.ft
+.)l
+.lp
+This will evaluate the expression in the source file and output the numerical
+result straight to the terminal in UTF-8 encoding.
+The last blank lines are stripped using the intrinsic \fChead\fP utility.
+Technically, if your output is the terminal, the typesetting is done by Nroff
+(not \s-2TROFF\s0).
+.pp
+Compilation warnings and errors spit out by \fCgroff\fP can be very hard to
+understand.
+If you typed the source file well, you will not likely find any errors.
+If you have typed the source file well without any mistakes, but there is still
+a warning or error, then the calculator output should \fBnot\fP be trusted and
+the fault is very likely mine (the programmer's).
+.sh 2 "Output"
+.pp
+If you typed the source file correctly without any syntactical or spelling
+mistakes, the output will definitely contain the numerical result of the
+evaluation of the token stack.
+.pp
+However, the result could be wrong if there was a warning or an error during
+compilation, an error during evaluation, an error before printing the result, or
+if you have (in)advertently pushed the calculator to or beyond its limits (c.f.
+\(sc\ Capabilities).
+Also, even if there were no machine-noticeable errors, the result is only as
+good as the input given by the human.
+Run-time errors are output directly to the resulting document before the
+evaluation result is printed (I'm considering outputing errors to stderr
+instead, though).
+.pp
+If everything went well, the output should look something like this:
+.(l
+.ft C
+8
+.ft P
+.)l
+.lp
+This is the correct answer because (7 \(pl 9) \(di (6 \(mi 4) \(eq 16 \(di 2
+\(eq 8.
+.pp
+As of the time of this writing, the only error the calculator is programmed to
+complain about is when there is/are some number(s) left behind unevaluated in
+the evaluation stack that cannot be evaluated further.
+This is likely due to human error in the Input stages (c.f. \(sc\ Input).
+If that is so, the output should look something like this:
+.(l
+.ft C
+\f(CBERROR:\fP Malformed input expression in token stack. 8
+.ft P
+.)l
+.lp
+This is likely to happen if you accidentally push an extra value into the token
+stack.
+As you can see, you still get the answer, but depending on how the error
+occurred, it could be incorrect.
+So, fix the error first!
+.sh 1 "Motivation"
+.(x mm
+Motivation
+.)x
+.pp
+As a typical teenager going through chronic depression and anxiety, I seldom
+have a lot of motivation.
+However, if there is something that can motivate me, it is \s-2UNIX\s0 and its
+quirks.
+\s-2TROFF\s0 is one of the quirks I love the most.
+It is not just a language for typesetting (although it is extremely good at it),
+it also has enough capabilities to perform other more complex computational
+tasks that other more mainstream programming languages can handle as well.
+.pp
+Before this calculator, I have coaxed \s-2TROFF\s0 into evaluating factorials
+and printing Fibonacci sequences.
+It was fun, but got boring pretty quickly.
+This calculator is by far the most interesting thing yet.
+.pp
+It is my decision to create this repository in order to demonstrate this
+capability within \s-2TROFF\s0 that actually transcends \s-2TROFF\s0's core
+values.
+To quote Professor Brian W. Kernighan from the book, \fITroff User's Manual\fP
+from November 1992\*#:
+.(d
+\*#
+.ul
+Troff User's Manual
+by Joe F. Ossanna and Prof. Brian W. Kernighan (November 1992)
+.)d
+.(q
+Joe Ossanna's \fItroff\fP remains a remarkable accomplishment.
+For fifteen years, it has proven a robust tool, taking unbelievable abuse from a
+variety of preprocessors and being forced into uses that were never conceived of
+in the original design, all with considerable grace under fire.
+.)q
+.pp
+With that said, I am deeply indebted to Joe F. Ossanna for creating such a
+magnificent masterpiece in typesetting (\s-2TROFF\s0) and Professor Brian W.
+Kernighan for his well-written books on \s-2TROFF\s0.
+.sh 1 "Getting help"
+.(x mm
+Getting help
+.)x
+.pp
+If you need help with this program or \s-2TROFF\s0, you can contact me
+personally.
+I'm Stephanie Bj\[:o]rk (Katt) <katt64@tuta.io>.
+.pp
+I am no expert in \s-2TROFF\s0 typesetting.
+I've just started out this year, so please bear in mind that I could very well
+be as clueless as you are. :p
+.++ B
+.+c "Bibliography"
+.(x
+Bibliography
+.)x
+.(x bib
+Bibliography
+.)x
+.pd
+.+c "Typesetting information"
+.(x bib
+Typesetting information
+.)x
+.if \n(yr>99 .nr yr -100
+.lp
+This paper was originally typeset using Groff v. 1.22.2 on Gentoo Linux on
+version 4.12.12-gentoo kernel with SMP, compiled on Fri Oct 13 11:24:03 +07
+2017, running on x86_64 Intel\(rg Core\(tm i5-2450M CPU @ 2.50GHz GenuineIntel.
+.lp
+This document was written in \s-2TROFF\s0 using the -me macros, on November 20,
+2017 03:15. This particular copy of the document was \s-2TROFF\s0'd on
+(yy-mm-dd): \n(yr-\n(mo-\n(dy.
+.++ P
+.+c "Abstract"
+.lp
+.ul
+This section does not exist in the README file in reStructuredText!
+.pp
+This is another format of the README file derived almost directly from the one
+in reStructuredText (\fCREADME.rst\fP).
+It is a README file containing information about the project
+\fIrpn-calculator\fP itself and also documents on how to use it properly.
+This document should have the same goal and objectives as the one in
+reStructuredText, regardless of which one was written first.
+.pp
+You may have noticed that this document has the Preliminaries at the very end,
+even after the bibliography.
+That's only natural to do when typesetting in \s-2TROFF\s+2.
+The purpose is so that entries to the table of contents can get a chance to
+accumulate by having passed all the sections of the page; the entries then
+eventually get printed at once after all sections have been gone through.
+The honest to goodness fact is that this is a necessary practice because
+compiling \s-2TROFF\s0 documents is a uni-directional, single-pass process;
+there's essentially no backtracking permitted.
+Were this document to be printed onto physical pages, it is common practice to
+physically rearrange the papers in such a way that the \fIpre\fPliminaries
+appear where they should be. :p
+.pp
+The author, who also happens to be the programmer, tries her best to keep the
+two files in sync, but sometimes they have to go out of sync, because she really
+cannot keep up with everything!
+Apparently, the only reason why I have an exact copy of the README file typeset
+in \s-2TROFF\s0 using the -me macros is because I want to keep with the
+tradition;
+it's just for classical, nostalgic, and novelty reasons, I guess!
+If you are generous and sympathetic enough to understand my thoughts, know
+how to typeset in \s-2TROFF\s0 using the -me macros, and also have the
+wherewithal for it, you are more than welcome to help out with keeping the two
+documents in sync. :)
+Even if they do go out of sync, though, it doesn't really matter.
+.pp
+One way to guarantee that one gets the latest possible version of this document
+is not to rely on the already-typeset PS or PDF output, as those can take time
+and effort to compile, but to compile it oneself.
+The datestamp at which this document was compiled can be referred to in
+Bibliography \(sc\ Typesetting information.
+.lp
+Ha en fin dag!
+.ft EMOJI
+😊❤️
+.ft
+.+c "Table of contents"
+.uh "Overview"
+.xp
+.uh "Main matter"
+.xp mm
+.uh "Bibliography"
+.xp bib
