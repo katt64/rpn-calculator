@@ -1,0 +1,80 @@
+.ig
+    Reverse Polish Notation Processor
+
+    Stephanie Björk (Katt) <katt64@tuta.io>
+
+    To ye who dare read this source file,
+    Just no. Don't. This is a land of no hope,
+    a land of broken dreams and broken souls.
+    I can never ever come back here and work on it again.
+    I don't understand a single line I wrote.
+
+    Requires the following stacks:
+	- Alice (stacks/alice.roff)
+	- Birch (stacks/birch.roff)
+..
+.so stacks/alice.roff
+.so stacks/birch.roff
+.de RPNPUSH
+.ie '\\$1'+' .APUSH 1 a
+.el \{ \
+.	ie '\\$1'-' .APUSH 2 a
+.	el \{ \
+.		ie '\\$1'*' .APUSH 3 a
+.		el \{ \
+.			ie '\\$1'/' .APUSH 4 a
+.			el \{ \
+.				ie '\\$1'%' .APUSH 5 a
+.				el .APUSH \\$1
+\}
+\}
+\}
+\}
+..
+.de L1
+.af CU 1
+.if \\n(CU<\\n(aC \{ \
+.	nr CU +1
+.	af CU A
+.	ie '\\g(A\\n(CU'a' \{ \
+.		nr WS \\n(bC
+.		nr O2 \\n(B\\n(WS
+.		nr WS \\n(bC-1
+.		nr O1 \\n(B\\n(WS
+.
+.		BPOP
+.		BPOP
+.
+.		ie '\\n(A\\n(CU'a' .nr RS \\n(O1+\\n(O2
+.		el \{ \
+.			ie '\\n(A\\n(CU'b' .nr RS \\n(O1-\\n(O2
+.			el \{ \
+.				ie '\\n(A\\n(CU'c' .nr RS \\n(O1*\\n(O2
+.				el \{ \
+.					ie '\\n(A\\n(CU'd' .nr RS \\n(O1/\\n(O2
+.						el \{ \
+.							if '\\n(A\\n(CU'e' .nr RS \\n(O1%\\n(O2
+\}
+\}
+\}
+\}
+\}
+.	el .nr RS \\n(A\\n(CU
+.	BPUSH \\n(RS
+.	L1
+\}
+..
+.de RPNRS
+.if \\n(bC>1 \f3ERROR:\fP Malformed expression in input stack.
+\\n(BA
+..
+.de RPNEVAL
+.nr O1 0
+.nr O2 0
+.nr RS 0
+.nr CU 0
+.nr WS 0
+.af WS A
+.L1
+.RPNRS
+..

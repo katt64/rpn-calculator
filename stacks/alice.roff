@@ -1,0 +1,28 @@
+.ig
+Alice stack
+
+Number registers: AA through AZ
+Methods: APUSH APOP APS
+..
+.nr aC 0
+.de APUSH
+.if (\\n(aC>=0)&(\\n(aC<27) \{ \
+.	nr aC +1
+.	af aC A
+.	nr A\\n(aC \\$1
+.	if \\n(.$=2 .af A\\n(aC \\$2
+.	af aC 1
+\}
+..
+.de APOP
+.if (\\n(aC>0)&(\\n(aC<27) \{ \
+.	af aC A
+.	af A\\n(aC 1
+.	rr A\\n(aC
+.	af aC 1
+.	nr aC -1
+\}
+..
+.de APS
+\\n(aC
+..

@@ -1,0 +1,28 @@
+.ig
+Birch stack
+
+Number registers: BA through BZ
+Methods: BPUSH BPOP BPS
+..
+.nr bC 0
+.de BPUSH
+.if (\\n(bC>=0)&(\\n(bC<27) \{ \
+.	nr bC +1
+.	af bC A
+.	nr B\\n(bC \\$1
+.	if \\n(.$=2 .af B\\n(bC \\$2
+.	af bC 1
+\}
+..
+.de BPOP
+.if (\\n(bC>0)&(\\n(bC<27) \{ \
+.	af bC A
+.	af B\\n(bC 1
+.	rr B\\n(bC
+.	af bC 1
+.	nr bC -1
+\}
+..
+.de BPS
+\\n(bC
+..
